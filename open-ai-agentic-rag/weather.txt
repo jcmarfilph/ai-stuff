@@ -1,0 +1,9 @@
+CITY: New York
+TEMP: 72F
+COND: Partly Cloudy
+RAIN: 10%
+CITY: Boston
+TEMP: 42F
+COND: Partly Cloudy
+RAIN: 0%
+SNOW: 12in
