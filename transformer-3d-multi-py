@@ -1,0 +1,74 @@
+# Image Classification
+import torch
+from torchvision.transforms import v2
+from torchvision import tv_tensors
+import matplotlib.pyplot as plt
+from PIL import Image
+
+H, W = 32, 32
+img = torch.randint(0, 256, size=(3, H, W), dtype=torch.uint8)
+
+transforms = v2.Compose([
+    v2.RandomResizedCrop(size=(224, 224), antialias=True),
+    v2.RandomHorizontalFlip(p=0.5),
+    v2.ToDtype(torch.float32, scale=True),
+    v2.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+img = transforms(img)
+
+#2. Reshape from (C, H, W) to (H, W, C) for Matplotlib
+display_image = img.permute(1, 2, 0)
+
+# 3. Render the image
+plt.figure(1)
+plt.imshow(display_image)
+plt.axis('off')
+#plt.show()
+
+img = torch.randint(0, 256, size=(3, H, W), dtype=torch.uint8)
+boxes = torch.randint(0, H // 2, size=(3, 4))
+boxes[:, 2:] += boxes[:, :2]
+boxes = tv_tensors.BoundingBoxes(boxes, format="XYXY", canvas_size=(H, W))
+
+# The same transforms can be used!
+img, boxes = transforms(img, boxes)
+# And you can pass arbitrary input structures
+output_dict = transforms({"image": img, "boxes": boxes})
+
+img = transforms(output_dict["boxes"])
+
+#Render the image
+plt.figure(2)
+plt.imshow(img)
+plt.axis('off')
+#plt.show()
+
+img = transforms(output_dict["image"])
+display_image = img.permute(1, 2, 0)
+
+#Render the image
+plt.figure(3)
+plt.imshow(display_image)
+plt.axis('off')
+#plt.show()
+
+# 1. Load your image and apply transforms
+img = Image.open("DSCF7304_cr.jpg")
+transform = v2.Compose([
+    v2.Resize(size=(256, 256)),
+    v2.GaussianBlur(99),
+    v2.Grayscale(3),
+    v2.ToTensor() # Converts to (C, H, W) tensor and scales to [0.0, 1.0]
+    
+])
+tensor_image = transform(img)
+
+# 2. Reshape from (C, H, W) to (H, W, C) for Matplotlib
+display_image = tensor_image.permute(1, 2, 0)
+
+# 3. Render the image
+plt.figure(4)
+plt.imshow(display_image)
+plt.axis('off')
+plt.show()
+
